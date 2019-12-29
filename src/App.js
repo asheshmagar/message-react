@@ -1,26 +1,65 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter,Route,Switch,Link,Redirect} from "react-router-dom"
+import {connect} from "react-redux"
+import * as MessageActions from "./store/actions/messageActions"
+import Auth from "./components/pages/Auth"
+import "./assets/css/swag.css"
+class  App extends React.Component {
+  componentDidMount(){
+    this.props.setupSocket();
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  }
+  render(){
+    return (
+      <div className="App">
+        <BrowserRouter>
+          <Switch>
+            <Route
+              path="/login"
+              component={Auth}
+
+
+            />
+            <Route
+              path="/signup"
+              component={Auth}
+
+
+            />
+            <Route
+              path="/"
+              render={props =>{
+                if(!this.props.token){
+                  return (
+                    <Redirect to="/login" />
+                  )
+                }else{
+                  return(
+                    <h1>Root</h1>
+                  )
+                }
+                
+              }}
+
+
+            />
+          </Switch>
+        </BrowserRouter>
+      </div>
+    );
+  }
+  
 }
-
-export default App;
+const mapStateToProps =state=>({
+  ...state.auth,
+  ...state.message
+})
+const mapDispatchToProps = dispatch =>({
+  setupSocket: () =>{
+    dispatch(MessageActions.setupSocket());
+  }
+})
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
